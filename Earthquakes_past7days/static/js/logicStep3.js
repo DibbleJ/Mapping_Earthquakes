@@ -28,15 +28,6 @@ let map = L.map('mapid', {
 // Pass our map layers into our layers control and add the layers control to the map.
 L.control.layers(baseMaps).addTo(map);
 
-// Add the streets tile layer to the map
-// satelliteStreets.addTo(map);
-
-// Accessing the airport GeoJSON URL
-let airportData = "https://raw.githubusercontent.com/DibbleJ/Mapping_Earthquakes/Mapping_GeoJSON_Points/Mapping_GeoJSON_Points/static/js/majorAirports.json"
-
-let torontoData = "https://raw.githubusercontent.com/DibbleJ/Mapping_Earthquakes/Mapping_GeoJSON_Linestrings/Mapping_GeoJSON_Linestrings/static/js/torontoRoutes.json"
-
-let torontoHoods = "https://raw.githubusercontent.com/DibbleJ/Mapping_Earthquakes/Mapping_GeoJSON_Polygons/Mapping_GeoJSON_Polygons/static/js/torontoNeighborhoods.json"
 // Create a style for the lines.
 let myStyle = {
   color: "#ffffa1",
@@ -50,11 +41,30 @@ function getRadius(magnitude) {
   return magnitude * 4;
 }
 
+function getColor(magnitude) {
+  if (magnitude > 5) {
+    return "#ea2c2c";
+  }
+  if (magnitude > 4) {
+    return "#ea822c";
+  }
+  if (magnitude > 3) {
+    return "#ee9c00";
+  }
+  if (magnitude > 2) {
+    return "#eecc00";
+  }
+  if (magnitude > 1) {
+    return "#d4ee00";
+  }
+  return "#98ee00";
+}
+
 function styleInfo(feature) {
   return {
     opacity: 1,
     fillOpacity: 1,
-    fillColor: "#ffae42",
+    fillColor: getColor(feature.properties.mag),
     color: "#000000",
     radius: getRadius(feature.properties.mag),
     stroke: true,
@@ -64,35 +74,18 @@ function styleInfo(feature) {
 
 // Retrieve the earthquake GeoJSON data.
 d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson").then(function(data) {
-  // Create a GeoJSON layer with the retrieved data
-  console.log(data);
-  L.geoJson(data, {
-// We turn each fature into a circleMarker on the map.
-pointToLayer: function(feature, latlng) {
-            console.log(data);
-            return L.circleMarker(latlng);
-    },
+ L.geoJson(data, {
+    // We turn each fature into a circleMarker on the map.
+    pointToLayer: function(feature, latlng) {
+        console.log(data);
+        return L.circleMarker(latlng);
+      },
+      // We set the style for each circleMarker using our styleInfo function.
     style: styleInfo,
-    onEachFeature: function(feature, layer) {
-      layer.bindPoup("<p>Magnitude: " + feature.properties.mag + "</p><br><p>Location: " + feature.properties.place)
+      // We create a popup for each circleMarker to display the magnitde and
+      // location of the earthquake after the moarker has been created and styled.
+      onEachFeature: function(feature, layer) {
+      layer.bindPopup("Magnitude: " + feature.properties.mag + "<br>Location: " + feature.properties.place)
     }
   }).addTo(map);
 });
-  /*, {
-    lineweight: 1,
-    color: 'blue',
-    fillColor: "#ffff01",
-    onEachFeature: function(feature, layer) {
-      layer.bindPopup("<h2>Neighborhood: " + feature.properties.AREA_NAME)
-    }
-  }).addTo(map);
-});*/
-
-// L.geoJson(data,  {
-//   style: myStyle,
-//   onEachFeature: function(feature, layer) {
-//     layer.bindPopup("<h2>Airline: " + feature.properties.airline + "</h2> <hr> <h3>Destination: " 
-//     + feature.properties.dst + "</h3>")
-//   }
-// }).addTo(map);
-// });
