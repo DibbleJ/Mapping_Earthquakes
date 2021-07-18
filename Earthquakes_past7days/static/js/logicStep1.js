@@ -14,14 +14,14 @@ attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStree
 
 // Create a base layer that holds both maps.
 let baseMaps = {
-  Streets: streets,
-  "Satellite Streets": satelliteStreets
+  "Streets": streets,
+  "Satellite": satelliteStreets
 };
 
 // Create the map object with center, zoom level and default layer.
 let map = L.map('mapid', {
-  center: [43.7, -79.3],
-  zoom: 11,
+  center: [39.5, -98.5],
+  zoom: 3,
   layers: [streets]
 })
 
@@ -43,14 +43,13 @@ let myStyle = {
   weight: 2
 }
 
-// Grabbing our GeoJSON data.
-// d3.json(torontoHoods).then(function(data) {
-//   console.log(data);
-
-// Creating a GeoJSON layer with the retrieved data.
-d3.json(torontoHoods).then(function(data) {
+// Retrieve the earthquake GeoJSON data.
+d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson").then(function(data) {
+  // Create a GeoJSON layer with the retrieved data
   console.log(data);
-  L.geoJson(data, {
+  L.geoJson(data).addTo(map);
+});
+  /*, {
     lineweight: 1,
     color: 'blue',
     fillColor: "#ffff01",
@@ -58,7 +57,7 @@ d3.json(torontoHoods).then(function(data) {
       layer.bindPopup("<h2>Neighborhood: " + feature.properties.AREA_NAME)
     }
   }).addTo(map);
-});
+});*/
 
 // L.geoJson(data,  {
 //   style: myStyle,
